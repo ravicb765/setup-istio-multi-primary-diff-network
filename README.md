@@ -11,10 +11,10 @@ Component | Version
 VMWare workstation | 16.1.2 build
 Linux distribution | Ubuntu 20.04.2 LTS (focal)
 Container runtime | Docker Engine 20.10.7
-Kubernetes | v1.21.2
-CNI | Weavenet v2.8.1
+Kubernetes | v1.21.4
+CNI | Calico v2.8.1
 Load Balancer Implementation | MetalLB v0.10.2
-Istio | v1.10.1
+Istio | v1.11.4
 
 #### 1.2 VMWare Network config (NAT - VMnet8):
 Config | Value
@@ -202,7 +202,7 @@ _*References:*_
 curl -L https://istio.io/downloadIstio | sh -
   
 sudo rm /usr/local/bin/istioctl
-sudo ln -s `pwd`/istio-1.10.1/bin/istioctl /usr/local/bin/istioctl
+sudo ln -s `pwd`/istio-1.11.4/bin/istioctl /usr/local/bin/istioctl
 ```
 
 ## 6. Install k9s
@@ -294,11 +294,23 @@ sudo kubeadm init
 sudo kubeadm token create --print-join-command
 ```
 
-#### 8.3 Install the CNI - weave net
+#### 8.3 Install the CNI - Calico
 _*References:*_ 
-[Weaveworks - Integrating Kubernetes via the Addon](https://www.weave.works/docs/net/latest/kubernetes/kube-addon/#install)  
+https://docs.projectcalico.org/getting-started/kubernetes/self-managed-onprem/onpremises
 ```
-kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+Install Calico with Kubernetes API datastore, 50 nodes or less
+
+    Download the Calico networking manifest for the Kubernetes API datastore.
+
+curl https://docs.projectcalico.org/manifests/calico.yaml -O
+
+If you are using pod CIDR 192.168.0.0/16, skip to the next step. If you are using a different pod CIDR with kubeadm, no changes are required - Calico will automatically detect the CIDR based on the running configuration. For other platforms, make sure you uncomment the CALICO_IPV4POOL_CIDR variable in the manifest and set it to the same value as your chosen pod CIDR.
+Customize the manifest as necessary.
+
+Apply the manifest using the following command.
+
+kubectl apply -f calico.yaml
+
   
 watch kubectl get pods -A
 ```
